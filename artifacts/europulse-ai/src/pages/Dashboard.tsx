@@ -21,6 +21,7 @@ export default function Dashboard() {
   const { data: summary, isLoading: loadingSummary } = useGetDashboardSummary();
   const { data: alerts, isLoading: loadingAlerts } = useGetDashboardAlerts();
   const { data: heatmapData, isLoading: loadingHeatmap } = useGetDashboardHeatmap();
+  const alertItems = Array.isArray(alerts) ? alerts : [];
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
@@ -83,7 +84,7 @@ export default function Dashboard() {
           <div className="flex-1 overflow-y-auto p-2 space-y-2">
             {loadingAlerts ? (
               <div className="flex justify-center p-8"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
-            ) : alerts?.map(alert => (
+            ) : alertItems.map(alert => (
               <div key={alert.id} className="p-3 rounded-md hover:bg-muted/50 border border-transparent hover:border-border transition-colors cursor-pointer group flex flex-col gap-2">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2">
