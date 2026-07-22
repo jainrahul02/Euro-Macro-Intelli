@@ -1,0 +1,122 @@
+Create a new Next.js 14 project called "eu-macro-intelligence" with the following complete setup:
+
+TECH STACK:
+- Next.js 14 with App Router
+- TypeScript (strict mode)
+- Tailwind CSS for styling
+- shadcn/ui for UI components
+- Recharts for charts and visualizations
+- react-simple-maps for Europe map visualization
+- Lucide React for icons
+- @google-cloud/vertexai for Gemini AI integration
+- Framer Motion for smooth animations
+
+PROJECT STRUCTURE:
+Create this exact folder structure:
+
+/app
+  /layout.tsx (root layout with sidebar)
+  /page.tsx (main dashboard)
+  /news/page.tsx
+  /risk/page.tsx
+  /forecast/page.tsx
+  /simulator/page.tsx
+  /api
+    /dashboard/route.ts
+    /news/route.ts
+    /risk/route.ts
+    /forecast/route.ts
+    /simulator/route.ts
+    /sidebar/route.ts
+/components
+  /layout
+    - Sidebar.tsx (main navigation)
+    - DBImpactPanel.tsx (the "What This Means for DB" persistent panel)
+    - TopBar.tsx
+  /dashboard (components for dashboard page)
+  /news (components for news page)
+  /risk (components for risk page)
+  /forecast (components for forecast page)
+  /simulator (components for simulator page)
+  /shared
+    - AlertCard.tsx
+    - MetricCard.tsx
+    - EuropeMap.tsx
+    - LoadingSpinner.tsx
+/lib
+  /ai
+    - gemini.ts (Vertex AI client setup)
+    - agents.ts (all AI agent prompts and functions)
+  /data
+    - mockData.ts (mock data for hackathon)
+    - dbPortfolio.ts (Deutsche Bank exposure data)
+    - countries.ts (EU country list and metadata)
+    - scenarios.ts (scenario impact matrix)
+  /logic
+    - riskCalculator.ts (risk score formulas)
+    - forecastEngine.ts (forecast calculations)
+    - simulatorEngine.ts (scenario cascade logic)
+    - newsClassifier.ts (news processing)
+  /types
+    - index.ts (all TypeScript types)
+/public
+  /europe-geojson.json (map data)
+
+LAYOUT DESIGN:
+- Dark theme by default (professional bank feel)
+- Colors: dark navy background (#0A0E27), accent blue (#3B82F6), success green (#10B981), warning yellow (#F59E0B), danger red (#EF4444)
+- Left sidebar (240px) for navigation with 5 menu items: Dashboard, News, Risk, Forecast, Simulator
+- Right sidebar (360px) is the persistent "What This Means for DB" panel — visible on ALL pages
+- Main content area in the middle
+- Top bar with: logo "EU Macro Intelligence", current time, alert indicator, mode toggle (Simple/Banker/Detailed)
+
+ROOT LAYOUT (app/layout.tsx):
+- Should include left sidebar for navigation and right DBImpactPanel
+- The DBImpactPanel takes current page context and displays:
+  - Alert level indicator with color (green/yellow/orange/red)
+  - Top insight sentence
+  - 2 impact cards (department affected)
+  - 2-3 action recommendations
+  - 1-2 early warning alerts
+  - Mode toggle at bottom (Simple/Banker/Detailed)
+
+TYPES (lib/types/index.ts):
+Define these types:
+- Country (code, name, flag, region)
+- RiskScore (country, inflation, energy, debt, unemployment, housing, geopolitical, total)
+- NewsItem (id, headline, summary, source, timestamp, severity, affectedCountries, affectedSectors, marketImpact, explanation)
+- Forecast (metric, country, currentValue, predictedValue, confidence, direction, drivers, explanation)
+- Scenario (id, name, description, directEffects, secondaryEffects, countrySensitivity, dbImpact)
+- DBImpact (department, effect, severity, magnitude)
+- SidebarInsight (alertLevel, topInsight, impactCards, actions, earlyWarnings)
+
+MOCK DATA:
+Create realistic mock data in /lib/data/ for:
+- 10 EU countries (DE, FR, IT, ES, NL, BE, PL, AT, PT, IE) with realistic current values
+- 15 recent news items with pre-classified severity and impact
+- Current risk scores for each country
+- Deutsche Bank portfolio exposure (from earlier discussion)
+- 8 scenarios (oil spike, ECB cut, ECB hike, Russia escalation, EU recession, EUR crash, housing correction, energy disruption)
+
+VERTEX AI SETUP (lib/ai/gemini.ts):
+- Configure Vertex AI with Gemini 1.5 Pro
+- Create wrapper functions for structured JSON output
+- Environment variables: GCP_PROJECT_ID, GCP_LOCATION, GOOGLE_APPLICATION_CREDENTIALS
+
+README.md:
+Write a comprehensive README with:
+- Project title: "EU Macro Intelligence — AI-Powered Financial Risk Advisor for Deutsche Bank"
+- Problem statement
+- Solution overview
+- Key features (5 pages + smart sidebar)
+- Tech stack details
+- Architecture diagram (ASCII)
+- Setup instructions (npm install, env vars, run dev)
+- Deployment on GCP Cloud Run
+- Screenshots section (placeholders)
+- Team credits
+- Hackathon: Deutsche Bank Hackathon 2026
+
+Create all boilerplate files, install all dependencies, configure Tailwind, set up shadcn/ui, and make the app run with `npm run dev`. The home page should show a "coming soon" placeholder for now but the layout with both sidebars should be fully functional.
+
+Also create a .env.local.example file with all required environment variables listed.

@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "EuroPulse AI"
+version = "1.0.0"
+id = "artifacts/europulse-ai"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22303
+
+[services.development]
+run = "pnpm --filter @workspace/europulse-ai run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/europulse-ai", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/europulse-ai/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22303"
+BASE_PATH = "/"

@@ -3,20 +3,31 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: EuroPulse AI — EU Macro Intelligence API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: dashboard
+    description: Dashboard operations
+  - name: news
+    description: News operations
+  - name: risk
+    description: Risk radar operations
+  - name: forecast
+    description: Forecast operations
+  - name: simulator
+    description: Scenario simulator operations
+  - name: sidebar
+    description: Sidebar insight operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +35,545 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get dashboard KPI summary
+      responses:
+        "200":
+          description: Dashboard KPIs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /dashboard/alerts:
+    get:
+      operationId: getDashboardAlerts
+      tags: [dashboard]
+      summary: Get top alerts for today
+      responses:
+        "200":
+          description: List of alerts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Alert"
+
+  /dashboard/heatmap:
+    get:
+      operationId: getDashboardHeatmap
+      tags: [dashboard]
+      summary: Get Europe risk heatmap data
+      responses:
+        "200":
+          description: Heatmap country data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HeatmapCountry"
+
+  /news:
+    get:
+      operationId: getNews
+      tags: [news]
+      summary: Get news items with optional filters
+      parameters:
+        - name: country
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: severity
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [LOW, MEDIUM, HIGH]
+        - name: sector
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of news items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NewsItem"
+
+  /news/{id}:
+    get:
+      operationId: getNewsItem
+      tags: [news]
+      summary: Get a single news item
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: News item
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsItem"
+        "404":
+          description: Not found
+
+  /risk/countries:
+    get:
+      operationId: getRiskCountries
+      tags: [risk]
+      summary: Get country risk rankings
+      parameters:
+        - name: riskType
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [inflation, fx, energy, housing, geopolitical, overall]
+      responses:
+        "200":
+          description: Country risk rankings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CountryRisk"
+
+  /risk/heatmap:
+    get:
+      operationId: getRiskHeatmap
+      tags: [risk]
+      summary: Get risk heatmap data per country
+      parameters:
+        - name: riskType
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Heatmap data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HeatmapCountry"
+
+  /forecast/predictions:
+    get:
+      operationId: getForecastPredictions
+      tags: [forecast]
+      summary: Get all forecast predictions
+      responses:
+        "200":
+          description: List of forecast predictions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ForecastPrediction"
+
+  /simulator/scenarios:
+    get:
+      operationId: getScenarios
+      tags: [simulator]
+      summary: Get list of available shock scenarios
+      responses:
+        "200":
+          description: List of scenarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Scenario"
+
+  /simulator/run:
+    post:
+      operationId: runSimulation
+      tags: [simulator]
+      summary: Run a scenario simulation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SimulationInput"
+      responses:
+        "200":
+          description: Simulation result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimulationResult"
+
+  /sidebar/insight:
+    get:
+      operationId: getSidebarInsight
+      tags: [sidebar]
+      summary: Get AI insight panel for the current page context
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [dashboard, news, risk, forecast, simulator]
+      responses:
+        "200":
+          description: Sidebar insight
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SidebarInsight"
+
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
-      required:
-        - status
 
+    DashboardSummary:
+      type: object
+      required: [inflationIndex, eurUsd, bondYield10y, overallRiskScore, inflationChange, eurUsdChange, bondYieldChange, riskScoreChange]
+      properties:
+        inflationIndex:
+          type: number
+        inflationChange:
+          type: number
+        eurUsd:
+          type: number
+        eurUsdChange:
+          type: number
+        bondYield10y:
+          type: number
+        bondYieldChange:
+          type: number
+        overallRiskScore:
+          type: integer
+        overallRiskLevel:
+          type: string
+          enum: [Low, Medium, High]
+        riskScoreChange:
+          type: integer
+        lastUpdated:
+          type: string
+
+    Alert:
+      type: object
+      required: [id, countryCode, countryFlag, severity, headline, agentGenerated, timestamp]
+      properties:
+        id:
+          type: string
+        countryCode:
+          type: string
+        countryFlag:
+          type: string
+        severity:
+          type: string
+          enum: [LOW, MEDIUM, HIGH]
+        headline:
+          type: string
+        agentGenerated:
+          type: boolean
+        timestamp:
+          type: string
+
+    HeatmapCountry:
+      type: object
+      required: [countryCode, countryName, riskScore, riskLevel, inflationRisk, fxStress, energyRisk, housingRisk, geopoliticalRisk]
+      properties:
+        countryCode:
+          type: string
+        countryName:
+          type: string
+        riskScore:
+          type: integer
+        riskLevel:
+          type: string
+          enum: [Low, Medium, High]
+        inflationRisk:
+          type: integer
+        fxStress:
+          type: integer
+        energyRisk:
+          type: integer
+        housingRisk:
+          type: integer
+        geopoliticalRisk:
+          type: integer
+
+    NewsItem:
+      type: object
+      required: [id, headline, severity, countryCode, countryFlag, countryName, marketIndex, marketChange, whatHappened, whyItMatters, marketImpact, timestamp]
+      properties:
+        id:
+          type: string
+        headline:
+          type: string
+        severity:
+          type: string
+          enum: [LOW, MEDIUM, HIGH]
+        countryCode:
+          type: string
+        countryFlag:
+          type: string
+        countryName:
+          type: string
+        sector:
+          type: ["string", "null"]
+        marketIndex:
+          type: string
+        marketChange:
+          type: number
+        whatHappened:
+          type: string
+        whyItMatters:
+          type: string
+        marketImpact:
+          type: string
+        timestamp:
+          type: string
+        transmissionFlow:
+          type: ["array", "null"]
+          items:
+            $ref: "#/components/schemas/TransmissionStep"
+
+    TransmissionStep:
+      type: object
+      required: [label, detail, direction]
+      properties:
+        label:
+          type: string
+        detail:
+          type: string
+        direction:
+          type: string
+          enum: [up, down, neutral]
+
+    CountryRisk:
+      type: object
+      required: [rank, countryCode, countryFlag, countryName, overallScore, riskLevel, trend, inflationRisk, fxStress, energyRisk, housingRisk, geopoliticalRisk]
+      properties:
+        rank:
+          type: integer
+        countryCode:
+          type: string
+        countryFlag:
+          type: string
+        countryName:
+          type: string
+        overallScore:
+          type: integer
+        riskLevel:
+          type: string
+          enum: [Low, Medium, High]
+        trend:
+          type: string
+          enum: [up, down, stable]
+        inflationRisk:
+          type: integer
+        fxStress:
+          type: integer
+        energyRisk:
+          type: integer
+        housingRisk:
+          type: integer
+        geopoliticalRisk:
+          type: integer
+
+    ForecastPrediction:
+      type: object
+      required: [id, metric, metricLabel, currentValue, unit, confidence, direction, keyDrivers, chartData]
+      properties:
+        id:
+          type: string
+        metric:
+          type: string
+        metricLabel:
+          type: string
+        currentValue:
+          type: number
+        unit:
+          type: string
+        confidence:
+          type: integer
+        direction:
+          type: string
+          enum: [up, down, stable]
+        keyDrivers:
+          type: array
+          items:
+            type: string
+        chartData:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChartDataPoint"
+
+    ChartDataPoint:
+      type: object
+      required: [date, actual]
+      properties:
+        date:
+          type: string
+        actual:
+          type: ["number", "null"]
+        forecast:
+          type: ["number", "null"]
+        forecastHigh:
+          type: ["number", "null"]
+        forecastLow:
+          type: ["number", "null"]
+
+    Scenario:
+      type: object
+      required: [id, name, description, icon, defaultIntensity, minIntensity, maxIntensity, intensityUnit]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        icon:
+          type: string
+        defaultIntensity:
+          type: number
+        minIntensity:
+          type: number
+        maxIntensity:
+          type: number
+        intensityUnit:
+          type: string
+
+    SimulationInput:
+      type: object
+      required: [scenarioId, intensity]
+      properties:
+        scenarioId:
+          type: string
+        intensity:
+          type: number
+
+    SimulationResult:
+      type: object
+      required: [scenarioId, scenarioName, intensity, transmissionFlow, impacts, aiSummary, keyActions, recommendedAction]
+      properties:
+        scenarioId:
+          type: string
+        scenarioName:
+          type: string
+        intensity:
+          type: number
+        transmissionFlow:
+          type: array
+          items:
+            $ref: "#/components/schemas/SimTransmissionStep"
+        impacts:
+          type: array
+          items:
+            $ref: "#/components/schemas/SimImpact"
+        aiSummary:
+          type: string
+        keyActions:
+          type: array
+          items:
+            type: string
+        recommendedAction:
+          type: string
+
+    SimTransmissionStep:
+      type: object
+      required: [step, label, icon, severity, detail]
+      properties:
+        step:
+          type: integer
+        label:
+          type: string
+        icon:
+          type: string
+        severity:
+          type: string
+          enum: [Low, Medium, High]
+        detail:
+          type: string
+
+    SimImpact:
+      type: object
+      required: [metric, value, unit, direction, impactLevel, description]
+      properties:
+        metric:
+          type: string
+        value:
+          type: number
+        unit:
+          type: string
+        direction:
+          type: string
+          enum: [up, down]
+        impactLevel:
+          type: string
+          enum: [Low, Medium, High]
+        description:
+          type: string
+
+    SidebarInsight:
+      type: object
+      required: [page, alertLevel, topInsight, impactCards, actions, earlyWarning, recommendedAction]
+      properties:
+        page:
+          type: string
+        alertLevel:
+          type: string
+          enum: [green, yellow, orange, red]
+        topInsight:
+          type: string
+        viewMode:
+          type: string
+          enum: [Simple, Banker, Trader]
+        impactCards:
+          type: array
+          items:
+            $ref: "#/components/schemas/ImpactCard"
+        actions:
+          type: array
+          items:
+            type: string
+        earlyWarning:
+          type: string
+        recommendedAction:
+          type: string
+
+    ImpactCard:
+      type: object
+      required: [title, body]
+      properties:
+        title:
+          type: string
+        body:
+          type: string
