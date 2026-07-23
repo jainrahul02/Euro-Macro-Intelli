@@ -3,7 +3,7 @@
 export const dashboardSummary = {
   inflationIndex: 2.6,
   inflationChange: -0.3,
-  eurUsd: 1.0894,
+  eurUsd: 1.14,
   eurUsdChange: 0.42,
   bondYield10y: 2.48,
   bondYieldChange: -0.06,
