@@ -26,7 +26,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
               <div className="w-8 h-[2px] bg-background transform -rotate-45" />
             </div>
             <span className="font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
-              EuroPulse AI
+              EuroSight AI
             </span>
           </Link>
 
