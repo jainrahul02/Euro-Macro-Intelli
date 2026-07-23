@@ -1,7 +1,8 @@
 import React from 'react';
 import { useGetForecastPredictions } from '@workspace/api-client-react';
 import { Loader2, Bot, Database, Network, LineChart as ChartIcon, FileText, ArrowRight } from 'lucide-react';
-import { 
+import { type LucideIcon } from 'lucide-react';
+import {
   ComposedChart, 
   Line, 
   Area, 
@@ -146,24 +147,24 @@ export default function Forecast() {
           Model Pipeline Architecture
         </h3>
         <div className="flex items-center gap-4 min-w-max pb-2">
-          <AgentNode icon={<Database />} name="Data Agent" desc="Ingests ECB & Market Data" />
+          <AgentNode icon={Database} name="Data Agent" desc="Ingests ECB & Market Data" />
           <ArrowRight className="w-5 h-5 text-muted-foreground" />
-          <AgentNode icon={<ChartIcon />} name="Analysis Agent" desc="Identifies Correlations" />
+          <AgentNode icon={ChartIcon} name="Analysis Agent" desc="Identifies Correlations" />
           <ArrowRight className="w-5 h-5 text-muted-foreground" />
-          <AgentNode icon={<Bot />} name="Forecast Agent" desc="Runs Monte Carlo Sims" />
+          <AgentNode icon={Bot} name="Forecast Agent" desc="Runs Monte Carlo Sims" />
           <ArrowRight className="w-5 h-5 text-muted-foreground" />
-          <AgentNode icon={<FileText />} name="Explainer Agent" desc="Generates Insights" />
+          <AgentNode icon={FileText} name="Explainer Agent" desc="Generates Insights" />
         </div>
       </div>
     </div>
   );
 }
 
-function AgentNode({ icon, name, desc }: { icon: React.ReactNode, name: string, desc: string }) {
+function AgentNode({ icon: Icon, name, desc }: { icon: LucideIcon; name: string; desc: string }) {
   return (
     <div className="flex items-center gap-3 bg-muted/20 border border-border rounded-md p-3 min-w-[220px]">
       <div className="w-10 h-10 rounded-md bg-primary/10 text-primary flex items-center justify-center shrink-0">
-        {React.cloneElement(icon as React.ReactElement, { className: 'w-5 h-5' })}
+        <Icon className="w-5 h-5" />
       </div>
       <div>
         <div className="font-bold text-sm text-foreground">{name}</div>

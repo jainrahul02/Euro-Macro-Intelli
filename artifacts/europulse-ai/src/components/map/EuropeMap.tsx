@@ -18,9 +18,16 @@ interface EuropeMapProps {
 export function EuropeMap({ data = [], renderTooltip }: EuropeMapProps) {
   const countryRiskMap = React.useMemo(() => {
     const map: Record<string, HeatmapCountry> = {};
-    data.forEach(c => {
-      map[c.countryCode.toUpperCase()] = c;
-    });
+
+    // Ensure `data` is an array before attempting .forEach()
+    if (Array.isArray(data)) {
+      data.forEach((c) => {
+        if (c?.countryCode) {
+          map[c.countryCode.toUpperCase()] = c;
+        }
+      });
+    }
+
     return map;
   }, [data]);
 

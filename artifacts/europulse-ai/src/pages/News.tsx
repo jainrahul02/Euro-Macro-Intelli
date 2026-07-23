@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useGetNews, GetNewsParams, NewsItemSeverity } from '@workspace/api-client-react';
 import { SeverityBadge } from '@/components/ui/severity-badge';
-import { Bot, ChevronRight, Activity, FilterX, Loader2, ArrowRight } from 'lucide-react';
+import { Bot, ChevronRight, Activity, FilterX, Loader2, ArrowRight, Newspaper } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -9,6 +9,11 @@ export default function News() {
   const [filters, setFilters] = useState<GetNewsParams>({});
 
   const { data: newsItems, isLoading } = useGetNews(filters);
+
+  // Extract array safely regardless of response payload format
+  const itemList = Array.isArray(newsItems)
+    ? newsItems
+    : (newsItems as any)?.items || (newsItems as any)?.news || (newsItems as any)?.data || [];
 
   const resetFilters = () => setFilters({});
 
@@ -23,8 +28,8 @@ export default function News() {
 
       {/* Filters */}
       <div className="flex items-center gap-3 p-3 border border-border bg-card rounded-lg flex-wrap">
-        <Select 
-          value={filters.country || "all"} 
+        <Select
+          value={filters.country || "all"}
           onValueChange={v => setFilters(f => ({ ...f, country: v === "all" ? undefined : v }))}
         >
           <SelectTrigger className="w-[160px] h-9 bg-background/50">
@@ -34,13 +39,13 @@ export default function News() {
             <SelectItem value="all">All Countries</SelectItem>
             <SelectItem value="DE">Germany</SelectItem>
             <SelectItem value="FR">France</SelectItem>
-            <SelectItem value="IT">France</SelectItem>
-            <SelectItem value="ES">Italy</SelectItem>
+            <SelectItem value="IT">Italy</SelectItem>
+            <SelectItem value="ES">Spain</SelectItem>
           </SelectContent>
         </Select>
 
-        <Select 
-          value={filters.severity || "all"} 
+        <Select
+          value={filters.severity || "all"}
           onValueChange={v => setFilters(f => ({ ...f, severity: v === "all" ? undefined : v as NewsItemSeverity }))}
         >
           <SelectTrigger className="w-[160px] h-9 bg-background/50">
@@ -54,8 +59,8 @@ export default function News() {
           </SelectContent>
         </Select>
 
-        <Select 
-          value={filters.sector || "all"} 
+        <Select
+          value={filters.sector || "all"}
           onValueChange={v => setFilters(f => ({ ...f, sector: v === "all" ? undefined : v }))}
         >
           <SelectTrigger className="w-[160px] h-9 bg-background/50">
@@ -70,9 +75,9 @@ export default function News() {
           </SelectContent>
         </Select>
 
-        <Button 
-          variant="ghost" 
-          size="sm" 
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={resetFilters}
           className="h-9 px-3 text-muted-foreground hover:text-foreground"
           disabled={Object.keys(filters).length === 0}
@@ -85,15 +90,22 @@ export default function News() {
       {/* News Feed */}
       <div className="space-y-4">
         {isLoading ? (
-          <div className="flex justify-center p-12">
-            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+          <div className="flex items-center justify-center min-h-[400px]">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
-        ) : newsItems?.length === 0 ? (
-          <div className="text-center p-12 border border-border border-dashed rounded-lg bg-card/50">
-            <p className="text-muted-foreground">No intel matches your filters.</p>
+        ) : itemList.length === 0 ? (
+          <div className="flex flex-col items-center justify-center p-12 border border-dashed border-border bg-card rounded-lg text-center">
+            <Newspaper className="w-10 h-10 text-muted-foreground mb-3 opacity-50" />
+            <p className="text-base font-semibold text-foreground">No news items found</p>
+            <p className="text-sm text-muted-foreground mt-1">Try resetting your filters to view all breaking intelligence.</p>
+            <Button variant="outline" size="sm" onClick={resetFilters} className="mt-4">
+              Reset Filters
+            </Button>
           </div>
         ) : (
-          newsItems?.map(item => <NewsCard key={item.id} item={item} />)
+          itemList.map((item: any) => (
+            <NewsCard key={item.id} item={item} />
+          ))
         )}
       </div>
 
@@ -107,7 +119,7 @@ function NewsCard({ item }: { item: any }) {
   return (
     <div className="border border-border bg-card rounded-lg overflow-hidden transition-all hover:border-primary/30">
       <div className="p-5 flex flex-col gap-4">
-        
+
         {/* Header Row */}
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-2">
@@ -160,8 +172,8 @@ function NewsCard({ item }: { item: any }) {
             </div>
           </div>
 
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="sm"
             onClick={() => setExpanded(!expanded)}
             className="border-primary/20 text-primary hover:bg-primary/10 hover:text-primary"
@@ -185,7 +197,7 @@ function NewsCard({ item }: { item: any }) {
                 <div className="flex flex-col gap-2 min-w-[200px] flex-1">
                   <div className="h-2 w-full bg-border rounded-full overflow-hidden">
                     <div className={`h-full ${
-                      step.direction === 'up' ? 'bg-destructive' : 
+                      step.direction === 'up' ? 'bg-destructive' :
                       step.direction === 'down' ? 'bg-emerald-500' : 'bg-amber-500'
                     }`} style={{ width: '100%' }} />
                   </div>
